@@ -1,55 +1,68 @@
-import React, { useState } from 'react';
-import logo from './logo.svg';
-import styles from './App.module.css';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import Welcome from './components/Welcome/Welcome';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import videojs, { VideoJsPlayerOptions } from 'video.js';
+import 'video.js/dist/video-js.css';
+
+export const playerOptions = {
+  preload: 'auto',
+  controls: true,
+  responsive: true,
+  fluid: true,
+  inactivityTimeout: 0, // always show controls, never fade away
+  controlBar: {
+    children: [
+      'playToggle',
+      'ProgressControl',
+      'CurrentTimeDisplay',
+      'VolumePanel',
+    ],
+  },
+} as VideoJsPlayerOptions;
 
 function App(): JSX.Element {
-  const [count, setCount] = useState<number>(0);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const videoRef = React.useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const playerRef = React.useRef<any>(null);
+
+  useEffect(() => {
+    // Make sure videojs player is initialized once only
+    if (!playerRef.current) {
+      const videoElement = document.createElement('video-js');
+
+      videoElement.classList.add('vjs-big-play-centered');
+      videoRef.current?.appendChild(videoElement);
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const player = (playerRef.current! = videojs(
+        videoElement,
+        {
+          ...playerOptions,
+          autoplay: true,
+          sources: [
+            {
+              src: 'https://storage.googleapis.com/90seconds-production-attachments/attachment/attachment/2cb5dcf7092dc999f1aceb1e136dbb0a/SG-Sports-Hub-v5.mp4',
+              type: 'video/mp4',
+            },
+          ],
+        },
+        () => {
+          playerRef.current = player;
+        }
+      ));
+    } else {
+      const player = playerRef.current;
+
+      player.autoplay(playerOptions.autoplay);
+      player.src(playerOptions.sources);
+    }
+  }, [playerOptions, videoRef]);
 
   return (
     <Router>
-      <div className={styles.App}>
-        <header className={styles['App-header']}>
-          <img src={logo} className={styles['App-logo']} alt="logo" />
-          <Welcome />
-          <p>
-            <button onClick={() => setCount((count) => count + 1)}>
-              count is: {count}
-            </button>
-          </p>
-          <p>
-            Edit <code>App.tsx</code> and save to test HMR updates.
-          </p>
-          <p>
-            <a
-              className={styles['App-link']}
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learn React
-            </a>
-            {' | '}
-            <a
-              className={styles['App-link']}
-              href="https://vitejs.dev/guide/features.html"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Vite Docs
-            </a>
-          </p>
-          <Switch>
-            <Route path="/about">
-              <main>About</main>
-            </Route>
-            <Route path="/">
-              <main>Home</main>
-            </Route>
-          </Switch>
-        </header>
-      </div>
+      <div data-vjs-player>
+        <div ref={videoRef} />
+      </div>{' '}
     </Router>
   );
 }
