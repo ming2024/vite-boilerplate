@@ -17,23 +17,19 @@ pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-export interface PdfContentPreviewProps {
-  src: string;
-}
-
-const PdfContentPreview: React.FC<PdfContentPreviewProps> = ({
-  src = 'https://storage.googleapis.com/90seconds-production-attachments/attachment/attachment/b435fec943c28b30b123269604324128/DWYER-Nov2022cv.pdf',
-}) => {
-  const [pdfLoaded, setPdfLoaded] = useState(false);
+const PdfContentPreview: React.FC = () => {
+  const [, setPdfLoaded] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [wrapperHeight, setWrapperHeight] = useState(0);
+  const [, setWrapperHeight] = useState(0);
 
   return (
     <div>
       <div>
         <Document
-          file={src}
+          file={
+            'https://storage.googleapis.com/90seconds-production-attachments/attachment/attachment/b435fec943c28b30b123269604324128/DWYER-Nov2022cv.pdf'
+          }
           onLoadSuccess={({ numPages }) => {
             setTotalPages(numPages);
           }}
@@ -57,7 +53,9 @@ const PdfContentPreview: React.FC<PdfContentPreviewProps> = ({
       <div>
         <div>
           <Document
-            file={src}
+            file={
+              'https://storage.googleapis.com/90seconds-production-attachments/attachment/attachment/b435fec943c28b30b123269604324128/DWYER-Nov2022cv.pdf'
+            }
             onLoadSuccess={async (page) => {
               const pageObj = await page.getPage(1);
               const pageHeight = pageObj.view[3];
